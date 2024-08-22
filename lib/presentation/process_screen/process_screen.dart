@@ -99,7 +99,7 @@ class _ProcessScreenState extends State<ProcessScreen> {
             borderRadius: BorderRadius.circular(20),
             child: DecoratedBox(
                 decoration: BoxDecoration(
-                    color: percentProgress == 100 ? Colors.lightBlue : isNotSending ? Colors.blue : Colors.grey,
+                    color: isNotSending ? Colors.blue : percentProgress == 100 ? Colors.lightBlue : Colors.grey,
                     border: Border.all(
                       color: Colors.blueAccent,
                       width: 2,
