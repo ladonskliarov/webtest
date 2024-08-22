@@ -3,6 +3,11 @@
 
 import 'package:flutter/material.dart';
 
+import '/domain/converter.dart';
+import '/data/model/template.dart';
+import '/data/service/data_service.dart';
+import '../process_screen/process_screen.dart';
+
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
@@ -11,7 +16,25 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  final TextEditingController urlController = TextEditingController(text: 'https://flutter.webspark.dev/flutter/api');
+  final TextEditingController urlController = TextEditingController();
+  bool isButtonActive = false;
+
+  @override
+  void initState() {
+    urlController.addListener(() {
+      if ((!urlController.text.startsWith('https://') || !urlController.text.startsWith('http://')) &&
+          isButtonActive == true) {
+        isButtonActive = false;
+        setState(() {});
+      } else if ((urlController.text.startsWith('https://') || urlController.text.startsWith('http://')) &&
+          isButtonActive == false) {
+        isButtonActive = true;
+        DataService.url = urlController.text;
+        setState(() {});
+      }
+    });
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -40,22 +63,28 @@ class _HomeScreenState extends State<HomeScreen> {
                 borderRadius: BorderRadius.circular(20),
                 child: DecoratedBox(
                     decoration: BoxDecoration(
-                        color: Colors.lightBlue,
+                        color: isButtonActive ? Colors.lightBlue : Colors.grey,
                         border: Border.all(
                           color: Colors.blueAccent,
                           width: 2,
                         ),
                         borderRadius: BorderRadius.circular(20)),
                     child: GestureDetector(
-                      onTap: () async {
-                        // Just print input result
-                        debugPrint('flutter: [{id: 7d785c38-cd54-4a98-ab57-44e50ae646c1, field: [.X., .X., ...], start: {x: 2, y: 1}, end: {x: 0, y: 2}}, {id: 88746d24-bf68-4dea-a6b6-4a8fefb47eb9, field: [XXX., X..X, X..X, .XXX], start: {x: 0, y: 3}, end: {x: 3, y: 0}}]');
-
-                        //await DataService.getData(urlController.text);
-                        // if (context.mounted){
-                        //   Navigator.push(context, MaterialPageRoute<void>(builder: (context) => const ProcessScreen()));
-                        // }
-                      },
+                      onTap: isButtonActive
+                          ? () async {
+                              setState(() {
+                                isButtonActive = false;
+                              });
+                              final List<APITemplate> response = await DataService.getData(urlController.text);
+                              final templates = Converter.convert(response);
+                              if (context.mounted) {
+                                isButtonActive = true;
+                                setState(() {});
+                                Navigator.push(context,
+                                    MaterialPageRoute<void>(builder: (context) => ProcessScreen(templates: templates)));
+                              }
+                            }
+                          : null,
                       child: const SizedBox(
                         height: 60,
                         width: double.infinity,

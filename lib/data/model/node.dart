@@ -1,30 +1,28 @@
 // LSkliarov 20 August 2024 19:22 UTC+2
 // Node class
 
-class APINode {
-  APINode({required this.field, required this.start, required this.end});
-  final List<String> field;
-  final Map<String, int> start;
-  final Map<String, int> end;
+import 'dart:ui';
 
-  factory APINode.fromJson(Map<String, dynamic> e) {
-    return APINode(
-        field: List<String>.from(e['field']),
-        start: Map<String, int>.from(e['start']).cast<String, int>(),
-        end: Map<String, int>.from(e['end']).cast<String, int>());
+import '/presentation/preview_screen/preview_screen.dart';
+
+class Node {
+  Node(this.x, this.y);
+  Color color = hexToColor('#FFFFFF');
+  String? value;
+  final int x;
+  final int y;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) || other is Node && runtimeType == other.runtimeType && x == other.x && y == other.y;
+
+  @override
+  int get hashCode => x.hashCode ^ y.hashCode;
+
+  Map<String, dynamic> toJson() {
+    return {
+      'x': x,
+      'y': y,
+    };
   }
 }
-
-// class Node {
-//   Node({required this.access, required this.x, required this.y});
-
-//   final String access;
-//   final int x;
-//   final int y;
-
-//   factory Node.fromAPINode(APINode node) {
-//     return Node(
-//       x: node['x'],
-//     );
-//   }
-// }

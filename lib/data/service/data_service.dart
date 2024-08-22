@@ -4,18 +4,20 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 
-import '../model/node.dart';
+import '../model/template.dart';
 
 class DataService {
-  static Future<dynamic>? getData(String url) async {
+  static late String url;
+
+  static Future<dynamic>? getData(url) async {
     try {
       final response = await Dio().get(url);
 
       if (response.statusCode == 200) {
         debugPrint(response.data['data'].toString());
 
-        final List<APINode> result =
-            (response.data['data'] as List).map((e) => APINode.fromJson(e as Map<String, dynamic>)).toList();
+        final List<APITemplate> result =
+            (response.data['data'] as List).map((e) => APITemplate.fromJson(e as Map<String, dynamic>)).toList();
 
         return result;
       } else if (response.statusCode == 429) {
@@ -28,12 +30,13 @@ class DataService {
     }
   }
 
-  static Future<dynamic> postData(String url) async {
+  static Future<dynamic> postData(List<Map<String, dynamic>> data) async {
     try {
-      final response = await Dio().post(url);
+      final response = await Dio().post(url, data: data);
 
       if (response.statusCode == 200) {
         debugPrint(response.data.toString());
+
         return response.data;
       } else if (response.statusCode == 429) {
         return 'Too many requests';
